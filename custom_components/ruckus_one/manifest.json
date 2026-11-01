@@ -1,12 +1,14 @@
 {
   "domain": "ruckus_one",
   "name": "RUCKUS One",
-  "codeowners": ["@fmuffat"],
+  "codeowners": [
+    "@fmuffat"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/fmuffat/ha-ruckus-one",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/fmuffat/ha-ruckus-one/issues",
   "requirements": [],
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

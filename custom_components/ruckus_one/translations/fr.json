@@ -11,7 +11,7 @@
           "client_secret": "Secret partagé"
         },
         "data_description": {
-          "tenant_id": "Visible dans l'URL du tableau de bord : https://<région>.ruckus.cloud/<tenant ID>/t/..."
+          "tenant_id": "Visible dans l'URL du tableau de bord, juste après l'hôte de la région : https://eu.ruckus.cloud/TENANT_ID/t/dashboard"
         }
       },
       "venue": {

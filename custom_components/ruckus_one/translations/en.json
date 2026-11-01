@@ -11,7 +11,7 @@
           "client_secret": "Shared secret"
         },
         "data_description": {
-          "tenant_id": "Shown in the dashboard URL: https://<region>.ruckus.cloud/<tenant ID>/t/..."
+          "tenant_id": "Shown in the dashboard URL, right after the region host: https://eu.ruckus.cloud/TENANT_ID/t/dashboard"
         }
       },
       "venue": {
