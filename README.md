@@ -13,6 +13,7 @@ Monitor the access points of a **RUCKUS One** venue in Home Assistant.
   - Channels 2.4 / 5 / 6 GHz (with bandwidth and TX power), IP address, uplink, last boot
   - **PoE underpowered** problem sensor
 - Per venue: total **Wi-Fi clients** and **access points online**
+- **Client presence**: one `device_tracker` per Wi-Fi client of the venue (home / away), with access point, SSID, VLAN, band, channel, RSSI, SNR, device and OS type
 - New APs added to the venue appear automatically
 - Polls the RUCKUS One API every 60 s; the OAuth token is renewed automatically
 
@@ -37,7 +38,6 @@ Copy `custom_components/ruckus_one` into your `config/custom_components/` folder
 
 ## Roadmap
 
-- Client presence (`device_tracker`) limited to the selected venue
 - Per-SSID client counts
 - Alarms and events
 

@@ -49,7 +49,6 @@ class RuckusOneApEntity(CoordinatorEntity[RuckusOneCoordinator]):
             model=ap.get("model"),
             serial_number=serial,
             sw_version=ap.get("firmwareVersion"),
-            via_device=(DOMAIN, coordinator.venue_id),
         )
 
     @property

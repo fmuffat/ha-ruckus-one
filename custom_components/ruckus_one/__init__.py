@@ -19,7 +19,7 @@ from .const import (
 )
 from .coordinator import RuckusOneConfigEntry, RuckusOneCoordinator
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.DEVICE_TRACKER, Platform.SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: RuckusOneConfigEntry) -> bool:

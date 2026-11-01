@@ -22,6 +22,7 @@ class RuckusOneData:
     """Snapshot of one venue."""
 
     aps: dict[str, dict[str, Any]]  # keyed by serial number
+    clients: dict[str, dict[str, Any]]  # keyed by lower-case MAC address
     client_count: int
 
 
@@ -49,12 +50,15 @@ class RuckusOneCoordinator(DataUpdateCoordinator[RuckusOneData]):
     async def _async_update_data(self) -> RuckusOneData:
         try:
             aps = await self.api.async_get_aps(self.venue_id)
+            clients = await self.api.async_get_clients(self.venue_id)
         except RuckusOneAuthError as err:
             raise ConfigEntryAuthFailed(err) from err
         except RuckusOneError as err:
             raise UpdateFailed(err) from err
         by_serial = {ap["serialNumber"]: ap for ap in aps if ap.get("serialNumber")}
+        by_mac = {c["macAddress"].lower(): c for c in clients if c.get("macAddress")}
         return RuckusOneData(
             aps=by_serial,
-            client_count=sum(ap.get("clientCount") or 0 for ap in by_serial.values()),
+            clients=by_mac,
+            client_count=len(by_mac),
         )
