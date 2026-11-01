@@ -61,12 +61,19 @@ def _hostname(client: dict[str, Any], mac: str) -> str | None:
     return hostname
 
 
-def client_name(client: dict[str, Any], mac: str, clients: dict[str, dict[str, Any]]) -> str:
-    """Hostname, or a readable name built from the device fingerprint.
+def client_name(
+    client: dict[str, Any],
+    mac: str,
+    clients: dict[str, dict[str, Any]],
+    aliases: dict[str, str] | None = None,
+) -> str:
+    """Alias set in RUCKUS One, hostname, or a name built from the device fingerprint.
 
     The last two bytes of the MAC are appended when the name alone is not
     unique in the venue (several "Google-Home-Mini", "iPhone", ...).
     """
+    if aliases and (alias := aliases.get(mac)):
+        return alias
     if hostname := _hostname(client, mac):
         shared = sum(1 for m, c in clients.items() if _hostname(c, m) == hostname)
         return hostname if shared <= 1 else f"{hostname} {mac[-5:]}"
@@ -96,7 +103,9 @@ class RuckusOneClientTracker(CoordinatorEntity[RuckusOneCoordinator], ScannerEnt
         self._attr_unique_id = mac
         client = coordinator.data.clients.get(mac)
         self._attr_name = (
-            client_name(client, mac, coordinator.data.clients) if client else known_name or mac
+            client_name(client, mac, coordinator.data.clients, coordinator.data.aliases)
+            if client
+            else coordinator.data.aliases.get(mac) or known_name or mac
         )
         self._attr_device_info = DeviceInfo(
             connections={(CONNECTION_NETWORK_MAC, mac)},
@@ -107,6 +116,17 @@ class RuckusOneClientTracker(CoordinatorEntity[RuckusOneCoordinator], ScannerEnt
     @property
     def _client(self) -> dict[str, Any] | None:
         return self.coordinator.data.clients.get(self._mac)
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        # Follow alias changes made in RUCKUS One.
+        if client := self._client:
+            self._attr_name = client_name(
+                client, self._mac, self.coordinator.data.clients, self.coordinator.data.aliases
+            )
+        elif alias := self.coordinator.data.aliases.get(self._mac):
+            self._attr_name = alias
+        super()._handle_coordinator_update()
 
     @property
     def entity_registry_enabled_default(self) -> bool:

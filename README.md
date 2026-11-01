@@ -13,7 +13,7 @@ Monitor the access points of a **RUCKUS One** venue in Home Assistant.
   - Channels 2.4 / 5 / 6 GHz (with bandwidth and TX power), IP address, uplink, last boot
   - **PoE underpowered** problem sensor
 - Per venue: total **Wi-Fi clients** and **access points online**
-- **Client presence**: one `device_tracker` per Wi-Fi client of the venue (home / away), with access point, SSID, VLAN, band, channel, RSSI, SNR, device and OS type. Each client gets its own device (linked by MAC address to an existing device when there is one); clients without a hostname get a readable name such as `Amazon Kindle 2c:91`
+- **Client presence**: one `device_tracker` per Wi-Fi client of the venue (home / away), with access point, SSID, VLAN, band, channel, RSSI, SNR, device and OS type. Each client gets its own device (linked by MAC address to an existing device when there is one); clients are named after their **RUCKUS One alias** when one is set, else their hostname, else a readable name such as `Amazon Kindle 2c:91`. Only clients of the selected venue are tracked
 - New APs added to the venue appear automatically
 - Polls the RUCKUS One API every 60 s; the OAuth token is renewed automatically
 

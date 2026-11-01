@@ -87,14 +87,16 @@ class RuckusOneApi:
                 raise RuckusOneError(err) from err
         raise RuckusOneAuthError(f"{path} refused after token refresh")
 
-    async def _query_all(self, path: str, venue_id: str) -> list[dict[str, Any]]:
+    async def _query_all(
+        self, path: str, filters: dict[str, list[str]]
+    ) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
         page = 1
         while True:
             body = await self._request(
                 "POST",
                 path,
-                {"filters": {"venueId": [venue_id]}, "page": page, "pageSize": PAGE_SIZE},
+                {"filters": filters, "page": page, "pageSize": PAGE_SIZE},
             )
             data = body.get("data") or []
             items.extend(data)
@@ -108,8 +110,26 @@ class RuckusOneApi:
 
     async def async_get_aps(self, venue_id: str) -> list[dict[str, Any]]:
         """Return the access points of one venue."""
-        return await self._query_all("/venues/aps/query", venue_id)
+        return await self._query_all("/venues/aps/query", {"venueId": [venue_id]})
 
     async def async_get_clients(self, venue_id: str) -> list[dict[str, Any]]:
         """Return the Wi-Fi clients connected in one venue."""
-        return await self._query_all("/venues/aps/clients/query", venue_id)
+        # The clients view ignores "venueId"; it filters on the nested venue id.
+        return await self._query_all(
+            "/venues/aps/clients/query", {"venueInformation.id": [venue_id]}
+        )
+
+    async def async_get_aliases(self) -> dict[str, str]:
+        """Return the client aliases of the tenant, keyed by lower-case MAC."""
+        aliases: dict[str, str] = {}
+        page = 0
+        while True:
+            body = await self._request(
+                "POST", f"/clients/aliases/query?page={page}&size={PAGE_SIZE}", {}
+            )
+            for item in body.get("content") or []:
+                if (mac := item.get("macAddress")) and item.get("alias"):
+                    aliases[mac.lower()] = item["alias"]
+            if body.get("last", True) or not body.get("content"):
+                return aliases
+            page += 1

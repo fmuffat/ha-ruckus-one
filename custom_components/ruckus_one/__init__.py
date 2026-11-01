@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import RuckusOneApi
@@ -49,3 +49,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: RuckusOneConfigEntry) ->
 async def async_unload_entry(hass: HomeAssistant, entry: RuckusOneConfigEntry) -> bool:
     """Unload a config entry."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: RuckusOneConfigEntry) -> bool:
+    """Migrate old entries."""
+    if entry.version > 1:
+        return False
+    if entry.minor_version < 2:
+        # Before 0.3.0 the client list was not filtered on the venue: drop all
+        # trackers, the clients of the selected venue are recreated on startup.
+        registry = er.async_get(hass)
+        for reg in er.async_entries_for_config_entry(registry, entry.entry_id):
+            if reg.domain == "device_tracker":
+                registry.async_remove(reg.entity_id)
+        hass.config_entries.async_update_entry(entry, minor_version=2)
+    return True

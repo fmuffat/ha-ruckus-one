@@ -55,6 +55,7 @@ class RuckusOneConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for RUCKUS One."""
 
     VERSION = 1
+    MINOR_VERSION = 2
 
     def __init__(self) -> None:
         self._credentials: dict[str, Any] = {}
