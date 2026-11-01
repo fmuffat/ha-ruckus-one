@@ -7,6 +7,7 @@ from typing import Any
 from homeassistant.components.device_tracker import ScannerEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -44,6 +45,44 @@ async def async_setup_entry(
     entry.async_on_unload(coordinator.async_add_listener(add_new_clients))
 
 
+GENERIC_HOSTNAMES = {"n/a", "unknown", "wlan0", "localhost", "android", "espressif"}
+
+
+def _is_unknown(value: str | None) -> bool:
+    return not value or value.strip().lower() in ("unknown", "other", "n/a")
+
+
+def _hostname(client: dict[str, Any], mac: str) -> str | None:
+    hostname = (client.get("hostname") or "").strip()
+    if not hostname or hostname.lower() in GENERIC_HOSTNAMES:
+        return None
+    if hostname.replace(":", "").replace("-", "").lower() == mac.replace(":", ""):
+        return None
+    return hostname
+
+
+def client_name(client: dict[str, Any], mac: str, clients: dict[str, dict[str, Any]]) -> str:
+    """Hostname, or a readable name built from the device fingerprint.
+
+    The last two bytes of the MAC are appended when the name alone is not
+    unique in the venue (several "Google-Home-Mini", "iPhone", ...).
+    """
+    if hostname := _hostname(client, mac):
+        shared = sum(1 for m, c in clients.items() if _hostname(c, m) == hostname)
+        return hostname if shared <= 1 else f"{hostname} {mac[-5:]}"
+    base = None
+    for candidate in (client.get("modelName"), client.get("osType"), client.get("deviceType")):
+        if not _is_unknown(candidate):
+            base = candidate.split("/")[0].strip()
+            break
+    return f"{base or 'Wi-Fi client'} {mac[-5:]}"
+
+
+def client_model(client: dict[str, Any]) -> str | None:
+    model = client.get("modelName")
+    return None if _is_unknown(model) else model
+
+
 class RuckusOneClientTracker(CoordinatorEntity[RuckusOneCoordinator], ScannerEntity):
     """Presence of one Wi-Fi client."""
 
@@ -55,8 +94,15 @@ class RuckusOneClientTracker(CoordinatorEntity[RuckusOneCoordinator], ScannerEnt
         super().__init__(coordinator)
         self._mac = mac
         self._attr_unique_id = mac
-        client = coordinator.data.clients.get(mac) or {}
-        self._attr_name = client.get("hostname") or known_name or mac
+        client = coordinator.data.clients.get(mac)
+        self._attr_name = (
+            client_name(client, mac, coordinator.data.clients) if client else known_name or mac
+        )
+        self._attr_device_info = DeviceInfo(
+            connections={(CONNECTION_NETWORK_MAC, mac)},
+            default_name=self._attr_name,
+            default_model=client_model(client) if client else None,
+        )
 
     @property
     def _client(self) -> dict[str, Any] | None:
