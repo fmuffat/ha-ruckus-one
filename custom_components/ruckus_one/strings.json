@@ -1,0 +1,86 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "RUCKUS One",
+        "description": "Create an Application Token in RUCKUS One (Administration > Account Management > Settings > Add Token). A read-only scope is enough.",
+        "data": {
+          "region": "Region",
+          "tenant_id": "Tenant ID",
+          "client_id": "Client ID",
+          "client_secret": "Shared secret"
+        },
+        "data_description": {
+          "tenant_id": "Shown in the dashboard URL: https://<region>.ruckus.cloud/<tenant ID>/t/..."
+        }
+      },
+      "venue": {
+        "title": "Venue",
+        "description": "Choose the venue to monitor. Add the integration again for another venue.",
+        "data": {
+          "venue_id": "Venue"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid tenant ID, client ID or secret, or wrong region.",
+      "cannot_connect": "Cannot reach RUCKUS One.",
+      "no_venues": "No venue found in this tenant.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This venue is already configured."
+    }
+  },
+  "selector": {
+    "region": {
+      "options": {
+        "eu": "Europe",
+        "na": "North America",
+        "asia": "Asia"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      },
+      "poe_underpowered": {
+        "name": "PoE underpowered"
+      }
+    },
+    "sensor": {
+      "clients": {
+        "name": "Clients"
+      },
+      "status": {
+        "name": "Status"
+      },
+      "boot_time": {
+        "name": "Last boot"
+      },
+      "ip_address": {
+        "name": "IP address"
+      },
+      "uplink": {
+        "name": "Uplink"
+      },
+      "channel_2_4g": {
+        "name": "Channel 2.4 GHz"
+      },
+      "channel_5g": {
+        "name": "Channel 5 GHz"
+      },
+      "channel_6g": {
+        "name": "Channel 6 GHz"
+      },
+      "clients_total": {
+        "name": "Wi-Fi clients"
+      },
+      "aps_online": {
+        "name": "Access points online"
+      }
+    }
+  }
+}

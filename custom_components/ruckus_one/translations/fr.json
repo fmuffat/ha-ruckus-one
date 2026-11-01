@@ -1,0 +1,86 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "RUCKUS One",
+        "description": "Créez un Application Token dans RUCKUS One (Administration > Account Management > Settings > Add Token). Une portée en lecture seule suffit.",
+        "data": {
+          "region": "Région",
+          "tenant_id": "Tenant ID",
+          "client_id": "Client ID",
+          "client_secret": "Secret partagé"
+        },
+        "data_description": {
+          "tenant_id": "Visible dans l'URL du tableau de bord : https://<région>.ruckus.cloud/<tenant ID>/t/..."
+        }
+      },
+      "venue": {
+        "title": "Site (venue)",
+        "description": "Choisissez le site à surveiller. Ajoutez l'intégration une seconde fois pour un autre site.",
+        "data": {
+          "venue_id": "Site"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Tenant ID, Client ID ou secret invalide, ou mauvaise région.",
+      "cannot_connect": "Impossible de joindre RUCKUS One.",
+      "no_venues": "Aucun site trouvé dans ce tenant.",
+      "unknown": "Erreur inattendue."
+    },
+    "abort": {
+      "already_configured": "Ce site est déjà configuré."
+    }
+  },
+  "selector": {
+    "region": {
+      "options": {
+        "eu": "Europe",
+        "na": "Amérique du Nord",
+        "asia": "Asie"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "online": {
+        "name": "En ligne"
+      },
+      "poe_underpowered": {
+        "name": "PoE insuffisant"
+      }
+    },
+    "sensor": {
+      "clients": {
+        "name": "Clients"
+      },
+      "status": {
+        "name": "Statut"
+      },
+      "boot_time": {
+        "name": "Dernier démarrage"
+      },
+      "ip_address": {
+        "name": "Adresse IP"
+      },
+      "uplink": {
+        "name": "Liaison montante"
+      },
+      "channel_2_4g": {
+        "name": "Canal 2,4 GHz"
+      },
+      "channel_5g": {
+        "name": "Canal 5 GHz"
+      },
+      "channel_6g": {
+        "name": "Canal 6 GHz"
+      },
+      "clients_total": {
+        "name": "Clients Wi-Fi"
+      },
+      "aps_online": {
+        "name": "Points d'accès en ligne"
+      }
+    }
+  }
+}
